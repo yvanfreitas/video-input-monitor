@@ -1,4 +1,4 @@
-name: Build Electron App
+name: Release for Linux
 
 on:
   push:
@@ -9,13 +9,9 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build and Release
+  build-linux:
+    name: Build and Release for Linux
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
       - name: Checkout repository
@@ -30,27 +26,25 @@ jobs:
         run: |
           npm install
 
-      - name: Build Electron App
+      - name: Build Electron App for Linux
         run: |
-          npx electron-builder --$RUNNER_OS
-        env:
-          RUNNER_OS: ${{ matrix.os == 'windows-latest' && 'win' || matrix.os == 'macos-latest' && 'mac' || 'linux' }}
+          npx electron-builder --linux
 
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: electron-app-${{ matrix.os }}
+          name: electron-app-linux
           path: dist/*
 
   release:
     name: Create Release
-    needs: build
+    needs: build-linux
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: electron-app-*
+          name: electron-app-linux
           path: release-artifacts
 
       - name: Create GitHub Release
