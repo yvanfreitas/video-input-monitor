@@ -2,6 +2,9 @@ name: Release for Linux
 
 on:
   push:
+    tags:
+      - 'v*'
+  push:
     branches:
       - main
   pull_request:
@@ -50,6 +53,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ github.ref }}
           files: release-artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
