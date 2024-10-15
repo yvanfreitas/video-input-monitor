@@ -1,3 +1,4 @@
+
 const { app, BrowserWindow } = require('electron')
 const path = require('node:path')
 
@@ -10,6 +11,8 @@ const createWindow = () => {
     }
   })
   mainWindow.loadFile('index.html')
+  mainWindow.setMenuBarVisibility(false)
+}
 
 app.whenReady().then(() => {
   createWindow()
