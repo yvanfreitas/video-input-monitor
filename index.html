@@ -11,16 +11,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #222;
+            background-color: #333;
         }
         video {
-            width:100%;
-            max-width: 100hh;
+            width: 100%;
+            max-width: 100vw;
             max-height: 100vh;
             object-fit: cover;
             object-position: center;
-
-            background-color: #222;
         }
         .controls {
             position: absolute;
@@ -32,6 +30,10 @@
             background: rgba(0, 0, 0, 0.5);
             padding: 10px;
             border-radius: 8px;
+            transition: opacity 0.5s ease;
+        }
+        .controls.hidden {
+            opacity: 0;
         }
         select, button {
             color: white;
@@ -44,7 +46,7 @@
 </head>
 <body>
     <video id="video" autoplay playsinline></video>
-    <div class="controls">
+    <div class="controls" id="controls">
         <select id="videoSelect"></select>
         <button onclick="toggleFullScreen()">
             <img src="https://img.icons8.com/ios-filled/50/ffffff/full-screen.png" alt="Fullscreen" width="20" height="20">
@@ -57,7 +59,9 @@
     <script>
         const videoElement = document.getElementById('video');
         const videoSelect = document.getElementById('videoSelect');
+        const controls = document.getElementById('controls');
         let currentStream;
+        let hideControlsTimeout;
 
         async function start() {
             if (typeof currentStream !== 'undefined') {
@@ -134,11 +138,20 @@
             }
         }
 
+        function resetControlsHideTimer() {
+            controls.classList.remove('hidden');
+            clearTimeout(hideControlsTimeout);
+            hideControlsTimeout = setTimeout(() => {
+                controls.classList.add('hidden');
+            }, 5000);
+        }
+
+        document.addEventListener('mousemove', resetControlsHideTimer);
         videoSelect.addEventListener('change', start);
 
         init();
-
         navigator.mediaDevices.addEventListener('devicechange', getDevices);
+        resetControlsHideTimer();
     </script>
 </body>
 </html>
