@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Full screen video input</title>
+		<style>
+			body,
+			html {
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+				height: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background-color: rgb(46, 46, 46);
+			}
+			video {
+				width: 100%;
+				max-height: 100vh;
+				object-fit: cover;
+				object-position: center;
+			}
+			.controls {
+				position: absolute;
+				top: 10px;
+				left: 50%;
+				transform: translateX(-50%);
+				display: flex;
+				gap: 10px;
+				background: rgba(0, 0, 0, 0.5);
+				padding: 10px;
+				border-radius: 8px;
+			}
+			select,
+			button {
+				color: white;
+				background-color: transparent;
+				border: 1px solid white;
+				padding: 5px;
+				border-radius: 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<video
+			id="video"
+			autoplay
+			playsinline
+		></video>
+		<div class="controls">
+			<select id="videoSelect"></select>
+			<button onclick="toggleFullScreen()">Full screen</button>
+		</div>
+
+		<script>
+			const videoElement = document.getElementById('video');
+			const videoSelect = document.getElementById('videoSelect');
+			let currentStream;
+
+			// Função para iniciar o vídeo com o dispositivo selecionado
+			async function start() {
+				if (typeof currentStream !== 'undefined') {
+					currentStream.getTracks().forEach((track) => {
+						track.stop();
+					});
+				}
+
+				const videoSource = videoSelect.value;
+				const constraints = {
+					video: {
+						deviceId: videoSource ? { exact: videoSource } : undefined,
+						width: 1920,
+						height: 1080,
+					},
+				};
+
+				try {
+					currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+					videoElement.srcObject = currentStream;
+				} catch (error) {
+					console.error('Erro ao acessar a webcam:', error);
+				}
+			}
+
+			// Função para obter a lista de dispositivos
+			async function getDevices() {
+				try {
+					const deviceInfos = await navigator.mediaDevices.enumerateDevices();
+					videoSelect.innerHTML = ''; // Limpa o select antes de preencher
+					for (let i = 0; i < deviceInfos.length; ++i) {
+						const deviceInfo = deviceInfos[i];
+						if (deviceInfo.kind === 'videoinput') {
+							const option = document.createElement('option');
+							option.value = deviceInfo.deviceId;
+							option.text = deviceInfo.label || `Input ${videoSelect.length + 1}`;
+							videoSelect.appendChild(option);
+						}
+					}
+					if (videoSelect.options.length > 0) {
+						videoSelect.selectedIndex = 0;
+						start(); // Inicia automaticamente com a primeira câmera
+					}
+				} catch (error) {
+					console.error('Erro ao listar dispositivos:', error);
+				}
+			}
+
+			// Solicita permissão para acessar a webcam e obtém a lista de dispositivos
+			async function init() {
+				try {
+					// Solicita permissão para acessar qualquer câmera, forçando o navegador a listar todas as disponíveis
+					const stream = await navigator.mediaDevices.getUserMedia({
+						video: { width: 1920, height: 1080 },
+					});
+					currentStream = stream;
+					videoElement.srcObject = stream;
+					await getDevices();
+				} catch (error) {
+					console.error('Erro ao acessar a webcam:', error);
+				}
+			}
+
+			// Função para alternar tela cheia
+			function toggleFullScreen() {
+				if (!document.fullscreenElement) {
+					videoElement.requestFullscreen().catch((err) => {
+						alert(`Erro ao entrar em tela cheia: ${err.message}`);
+					});
+				} else {
+					document.exitFullscreen();
+				}
+			}
+
+			// Atualiza o vídeo quando uma nova câmera é selecionada
+			videoSelect.addEventListener('change', start);
+
+			// Inicializa ao carregar a página
+			init();
+
+			// Atualiza a lista de dispositivos quando ocorrem mudanças
+			navigator.mediaDevices.addEventListener('devicechange', getDevices);
+		</script>
+	</body>
+</html>
