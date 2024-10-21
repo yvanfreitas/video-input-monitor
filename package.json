@@ -23,6 +23,7 @@
     "electron": "^33.0.0"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "@vercel/edge": "^0.1.2" 
   }
 }
