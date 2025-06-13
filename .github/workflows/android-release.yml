@@ -1,0 +1,122 @@
+name: Android Release to Play Store
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Trigger on version tags like v1.0.0, v1.2.3, v1.2.3-beta
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  release_android:
+    name: Build Signed AAB & APK and Release to Play Store
+    runs-on: ubuntu-latest
+
+    env:
+      # These will be populated by GitHub Secrets for signing the app
+      # Ensure these are set in GitHub repo secrets:
+      # ANDROID_RELEASE_KEYSTORE_BASE64
+      # ANDROID_RELEASE_KEY_ALIAS
+      # ANDROID_RELEASE_STORE_PASSWORD
+      # ANDROID_RELEASE_KEY_PASSWORD
+      # GOOGLE_PLAY_JSON_KEY_BASE64
+      KEYSTORE_FILE_PATH: android/app/my-release-key.keystore # Path where decoded keystore will be saved
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Set up Java (JDK)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-release-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-release-
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Decode Keystore
+        id: decode_keystore
+        run: |
+          echo "Decoding keystore..."
+          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}" | base64 --decode > ${{ env.KEYSTORE_FILE_PATH }}
+          echo "Keystore decoded to ${{ env.KEYSTORE_FILE_PATH }}"
+          # Verify file exists (optional, good for debugging)
+          if [ ! -f "${{ env.KEYSTORE_FILE_PATH }}" ]; then
+            echo "Keystore file NOT found at ${{ env.KEYSTORE_FILE_PATH }}"
+            exit 1
+          fi
+          echo "Keystore file found."
+        # Only run if the secret is available (i.e., not on forks without secrets)
+        if: secrets.ANDROID_RELEASE_KEYSTORE_BASE64 != ''
+
+      - name: Make gradlew executable
+        run: cd android && chmod +x ./gradlew && cd ..
+
+      - name: Build Signed Android App Bundle (AAB)
+        env: # Expose secrets as environment variables for build.gradle
+          MYAPP_RELEASE_STORE_FILE: ${{ env.KEYSTORE_FILE_PATH }}
+          MYAPP_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          MYAPP_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          MYAPP_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: cd android && ./gradlew bundleRelease --no-daemon
+        if: steps.decode_keystore.conclusion == 'success' # Only if keystore was decoded
+
+      - name: Build Signed Android APK
+        env: # Expose secrets as environment variables for build.gradle
+          MYAPP_RELEASE_STORE_FILE: ${{ env.KEYSTORE_FILE_PATH }}
+          MYAPP_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          MYAPP_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          MYAPP_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: cd android && ./gradlew assembleRelease --no-daemon
+        if: steps.decode_keystore.conclusion == 'success' # Only if keystore was decoded
+
+      - name: Sign AAB and Upload to Google Play
+        uses: google-actions/upload-play-release@v1 # Using Google's official action
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_JSON_KEY_BASE64 }} # Use plain text if action supports it, else save to file
+          packageName: com.fsvinative # From your app/build.gradle
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: internal # Or alpha, beta, production
+          # userFraction: 0.5 # For staged rollouts (optional)
+          # whatsNewDirectory: 'whatsnew/' # Directory with release notes (optional)
+        if: steps.decode_keystore.conclusion == 'success' && success() # Only if build succeeded and keystore available
+
+      - name: Get app version for release name (from app/build.gradle)
+        id: app_version
+        run: |
+          VERSION_NAME=$(grep 'versionName "' android/app/build.gradle | sed -n 's/.*versionName "\\([^"]*\\)".*/\1/p')
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
+        if: success() # Run if previous steps were successful
+
+      - name: Create GitHub Release and Upload Artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }} # Use the tag that triggered the workflow
+          name: Release v${{ steps.app_version.outputs.VERSION_NAME }} (${{ github.ref_name }})
+          body: |
+            Release for version v${{ steps.app_version.outputs.VERSION_NAME }}
+            - AAB uploaded to Google Play Store (Track: internal).
+            - Signed AAB and APK attached below.
+          files: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/apk/release/app-release.apk
+          draft: false
+          prerelease: contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') # Mark as pre-release if tag contains beta/alpha
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.decode_keystore.conclusion == 'success' && success() # Only if build succeeded and keystore available

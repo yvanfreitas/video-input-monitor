@@ -1,0 +1,97 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android" // If using Kotlin
+// If not using Kotlin, you might need to remove the above line and kotlin-stdlib dependency
+
+import com.android.build.application.internal.cxx.configure.gradleLocalProperties
+
+// Define an ext block if it's not already defined in the project's build.gradle
+project.ext.react = [
+    enableHermes: true,  // Hermes is enabled by default
+    devDisabledInRelease: true // For disabling dev support in release builds
+]
+
+android {
+    ndkVersion rootProject.ext.ndkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    namespace "com.fsvinative" // Change if needed
+
+    defaultConfig {
+        applicationId "com.fsvinative" // Change if needed
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            // Other debug specific flags if any
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true // Enable full minification for release
+            shrinkResources true // Remove unused resources
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            // If using Hermes, it's already optimized. Proguard runs additionally.
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions { // If using Kotlin
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    // Kotlin standard library (if using Kotlin)
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+
+    // React Native
+    implementation "com.facebook.react:react-android"
+    // Hermes engine
+    if (project.ext.react.enableHermes) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        // JSC engine
+        implementation ("org.webkit:android-jsc:+")
+    }
+
+    // Standard Android dependencies
+    implementation "androidx.appcompat:appcompat:1.6.1" // Example version
+    implementation "androidx.core:core-ktx:1.12.0"     // Example version for Kotlin
+
+    // Dependencies for camera functionality will be added later
+    // e.g., implementation "com.google.android.cameraview:cameraview:1.3.3"
+    // or a React Native camera module
+
+    // Autolinking will also add dependencies from node_modules here
+}
+
+// Apply React Native Gradle plugin
+apply from: file("../../node_modules/react-native/react.gradle")
+// Apply Hermes Gradle plugin (if Hermes is enabled)
+if (project.ext.react.enableHermes) {
+    apply from: file("../../node_modules/react-native/sdks/hermesc/hermesc.gradle")
+}

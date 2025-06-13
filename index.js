@@ -1,28 +1,5 @@
+import {AppRegistry} from 'react-native';
+import App from './App'; // We will create App.js next
+import {name as appName} from './app.json'; // We will create app.json next
 
-const { app, BrowserWindow } = require('electron')
-const path = require('node:path')
-
-const createWindow = () => {
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  })
-  mainWindow.loadFile('index.html')
-  mainWindow.setMenuBarVisibility(false)
-}
-
-app.whenReady().then(() => {
-  createWindow()
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
-
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+AppRegistry.registerComponent(appName, () => App);
