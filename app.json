@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Video Input Monitor",
+    "slug": "video-input-monitor",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "platforms": ["android"],
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.example.videoinputmonitor",
+      "permissions": ["CAMERA"]
+    }
+  }
+}

@@ -1,82 +1,53 @@
-# Video Input Monitor
+# Video Input Monitor (React Native)
 
-Video Input Monitor is a cross-platform Electron application that allows users to monitor webcam feeds with a clean and intuitive interface. The application includes fullscreen and Picture-in-Picture (PIP) modes, making it ideal for multi-tasking while using webcam feeds.
+Video Input Monitor is a React Native application for Android that allows you to monitor camera feeds with a simple interface. The app includes the ability to switch between the front and back cameras and supports Android Picture‑in‑Picture (PIP) mode.
 
 ## Features
 
-- **Webcam Selection**: Easily switch between multiple webcam devices connected to your system.
-- **Fullscreen Mode**: View the video feed in fullscreen mode for an immersive experience.
-- **Picture-in-Picture (PIP)**: Keep the video feed visible in a floating window while working on other tasks.
-- **Automatic Controls Hide**: The controls automatically hide after 5 seconds of inactivity for an unobstructed view.
+- **Camera Selection** – Easily switch between front and back cameras.
+- **Picture‑in‑Picture** – Enter PIP mode to keep the camera view visible while using other apps (Android only).
 
 ## Getting Started
 
 ### Prerequisites
 
 - **Node.js** (v18 or later)
-- **npm** (included with Node.js)
+- **npm**
+- **Expo CLI** (`npm install -g expo-cli`)
 
 ### Installation
 
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/yvanfreitas/video-input-monitor.git
-   cd video-input-monitor
-   ```
-
-2. Install the dependencies:
-
-   ```sh
-   npm install
-   ```
-
-### Running the Application
-
-To start the application in development mode, use:
-
 ```sh
-npm start
+npm install
 ```
 
-### Building for Distribution
+### Running on Android
 
-This project includes a GitHub Action workflow to generate executables for Windows, macOS, and Linux. To create a new release:
+```sh
+npm run android
+```
 
-1. Commit and push your changes to the `main` branch.
-2. GitHub Actions will automatically build the project and create executables for each platform as part of the release process.
+### Building the APK
 
-## Usage
+The repository includes a GitHub Actions workflow that uses Expo Application Services (EAS) to create a release build. Set the `EAS_TOKEN` secret in your repository before triggering the workflow.
 
-- Upon starting, the application will display the default webcam feed.
-- Use the dropdown menu to switch between available webcams.
-- Click the fullscreen button to maximize the video feed.
-- Click the Picture-in-Picture button to view the feed in PIP mode.
+You can also build locally with:
+
+```sh
+npx eas build --platform android --profile production
+```
 
 ## Project Structure
 
-- **main.js**: Main file for starting the Electron application.
-- **index.html**: Contains the UI for selecting webcam inputs and controlling video features.
-- **package.json**: Configuration and scripts for the project.
-- **preload.js** (optional): Preloading script for secure context handling.
-
-## GitHub Actions
-
-The GitHub Action workflow (`.github/workflows/build.yml`) automatically builds the application for Windows, macOS, and Linux when changes are pushed to the `main` branch, and creates a new release with the executables.
-
-## Dependencies
-
-- **Electron**: Cross-platform desktop application framework.
+- `App.js` – Main application component.
+- `index.js` – Entry point registered with Expo.
+- `app.json` – Expo configuration file.
+- You can add an `assets/` directory with your app icons if needed.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
-## Acknowledgements
-
-- Icons provided by [Icons8](https://icons8.com).
+This project is licensed under the MIT License.
 
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
