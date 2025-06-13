@@ -1,0 +1,29 @@
+name: Android Release
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - develop2
+  pull_request:
+    branches:
+      - main
+      - develop
+      - develop2
+
+    
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install -g expo-cli eas-cli
+      - run: npm install
+      - run: eas build --platform android --profile production --non-interactive
+        env:
+          EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
