@@ -1,82 +1,110 @@
-# Video Input Monitor
+# Video Input Monitor for Android
 
-Video Input Monitor is a cross-platform Electron application that allows users to monitor webcam feeds with a clean and intuitive interface. The application includes fullscreen and Picture-in-Picture (PIP) modes, making it ideal for multi-tasking while using webcam feeds.
+Video Input Monitor for Android is a React Native application that allows users to monitor device camera feeds with a clean interface.
 
 ## Features
 
-- **Webcam Selection**: Easily switch between multiple webcam devices connected to your system.
-- **Fullscreen Mode**: View the video feed in fullscreen mode for an immersive experience.
-- **Picture-in-Picture (PIP)**: Keep the video feed visible in a floating window while working on other tasks.
-- **Automatic Controls Hide**: The controls automatically hide after 5 seconds of inactivity for an unobstructed view.
+- **Live Camera View**: Displays live feed from the selected device camera.
+- **Camera Switching**: Easily switch between front and back cameras.
+- **Fullscreen Mode**: Hides the system status bar for a more immersive view.
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
+- Node.js (v18 or later recommended)
+- npm (included with Node.js) or Yarn
+- React Native development environment: Follow the official guide for "Setting up the development environment" on the React Native website, selecting "React Native CLI Quickstart" for your OS. This includes installing an Android SDK and JDK.
+- Android Emulator or a connected Android device.
 
-- **Node.js** (v18 or later)
-- **npm** (included with Node.js)
+## Installation & Running
 
-### Installation
+1.  **Clone the repository:**
+    ```sh
+    git clone <your-repo-url>
+    cd <your-repo-name>
+    ```
 
-1. Clone the repository:
+2.  **Install dependencies:**
+    ```sh
+    npm install
+    # OR
+    # yarn install
+    ```
 
-   ```sh
-   git clone https://github.com/yvanfreitas/video-input-monitor.git
-   cd video-input-monitor
-   ```
+3.  **Run the application:**
+    ```sh
+    npx react-native run-android
+    # OR (if scripts are preferred)
+    # npm run android
+    # yarn android
+    ```
 
-2. Install the dependencies:
+## Building for Release (Local)
 
-   ```sh
-   npm install
-   ```
+To build a release version of the app locally:
 
-### Running the Application
+1.  **Generate a signing keystore:**
+    If you don't have one, generate it using `keytool`:
+    ```bash
+    keytool -genkeypair -v -keystore my-release-key.keystore -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000
+    ```
+    Place the `my-release-key.keystore` file in the `android/app/` directory. **Important:** Add `my-release-key.keystore` to your `.gitignore` file if you haven't already!
 
-To start the application in development mode, use:
+2.  **Configure keystore credentials:**
+    Create a file named `android/gradle.properties` (if it doesn't exist) and add the following lines (replace with your actual credentials). **Important:** Add `gradle.properties` to your `.gitignore` file!
+    ```properties
+    MYAPP_RELEASE_STORE_FILE=my-release-key.keystore
+    MYAPP_RELEASE_KEY_ALIAS=my-key-alias
+    MYAPP_RELEASE_STORE_PASSWORD=your_store_password
+    MYAPP_RELEASE_KEY_PASSWORD=your_key_password
+    ```
 
-```sh
-npm start
-```
+3.  **Build the App Bundle (AAB) or APK:**
+    Navigate to the `android` directory:
+    ```sh
+    cd android
+    ```
+    To build an AAB (for Google Play Store):
+    ```sh
+    ./gradlew bundleRelease
+    ```
+    The AAB will be located at `android/app/build/outputs/bundle/release/app-release.aab`.
 
-### Building for Distribution
+    To build an APK (for direct installs):
+    ```sh
+    ./gradlew assembleRelease
+    ```
+    The APK will be located at `android/app/build/outputs/apk/release/app-release.apk`.
+    Navigate back with `cd ..`
 
-This project includes a GitHub Action workflow to generate executables for Windows, macOS, and Linux. To create a new release:
+## CI/CD with GitHub Actions
 
-1. Commit and push your changes to the `main` branch.
-2. GitHub Actions will automatically build the project and create executables for each platform as part of the release process.
+This project uses GitHub Actions for Continuous Integration and Continuous Deployment:
 
-## Usage
+-   **`android-ci.yml` (Build & Test):**
+    -   Triggered on pushes and pull requests to `main` and `develop` branches.
+    -   Sets up the environment, installs dependencies.
+    -   Builds the Android App Bundle (AAB) to ensure the app builds correctly.
+    -   Uploads the AAB as a build artifact for inspection.
 
-- Upon starting, the application will display the default webcam feed.
-- Use the dropdown menu to switch between available webcams.
-- Click the fullscreen button to maximize the video feed.
-- Click the Picture-in-Picture button to view the feed in PIP mode.
+-   **`android-release.yml` (Release to Play Store & GitHub):**
+    -   Triggered on pushes to tags matching `v*.*.*` (e.g., `v1.0.0`, `v1.0.1-beta`).
+    -   Can also be triggered manually via the GitHub Actions UI (`workflow_dispatch`).
+    -   Builds a **signed** AAB and APK using secrets.
+    -   Uploads the AAB to the Google Play Store (to the `internal` track by default).
+    -   Creates a GitHub Release, attaching the generated AAB and APK files.
 
-## Project Structure
-
-- **main.js**: Main file for starting the Electron application.
-- **index.html**: Contains the UI for selecting webcam inputs and controlling video features.
-- **package.json**: Configuration and scripts for the project.
-- **preload.js** (optional): Preloading script for secure context handling.
-
-## GitHub Actions
-
-The GitHub Action workflow (`.github/workflows/build.yml`) automatically builds the application for Windows, macOS, and Linux when changes are pushed to the `main` branch, and creates a new release with the executables.
-
-## Dependencies
-
-- **Electron**: Cross-platform desktop application framework.
+### Required GitHub Secrets for Release Workflow:
+For the `android-release.yml` workflow to publish to the Play Store and create signed artifacts, the following secrets must be configured in your GitHub repository settings (under "Secrets and variables" > "Actions"):
+-   `ANDROID_RELEASE_KEYSTORE_BASE64`: The base64 encoded content of your release keystore file.
+-   `ANDROID_RELEASE_KEY_ALIAS`: The alias for your release key.
+-   `ANDROID_RELEASE_STORE_PASSWORD`: Your keystore password.
+-   `ANDROID_RELEASE_KEY_PASSWORD`: Your release key's password.
+-   `GOOGLE_PLAY_JSON_KEY_BASE64`: The base64 encoded JSON service account key from Google Play Console with permissions to upload app bundles.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
-## Acknowledgements
-
-- Icons provided by [Icons8](https://icons8.com).
+This project is licensed under the MIT License.
 
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
