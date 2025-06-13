@@ -21,7 +21,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        missingDimensionStrategy "react-native-camera", "general" // If using react-native-camera later
     }
 
     signingConfigs {
@@ -31,17 +30,27 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        // release {} // We will configure this later in the CI/CD setup
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
     }
 
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            // Other debug specific flags if any
         }
         release {
-            // signingConfig signingConfigs.release // Will be configured later
-            minifyEnabled enableHermes // Or true if not using Hermes but want to minify
+            signingConfig signingConfigs.release
+            minifyEnabled true // Enable full minification for release
+            shrinkResources true // Remove unused resources
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            // If using Hermes, it's already optimized. Proguard runs additionally.
         }
     }
 

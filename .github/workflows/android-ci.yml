@@ -1,0 +1,70 @@
+name: Android CI Build & Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop # Or your primary development branch
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build_android:
+    name: Build Android App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or '20'
+
+      - name: Set up Java (JDK)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # Or 'zulu', 'adopt'
+          java-version: '17'    # Commonly used for modern Android
+
+      # It's often good practice to cache Gradle dependencies and wrappers
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Install npm dependencies
+        run: npm install
+
+      # Placeholder for linting - to be added later
+      # - name: Lint code
+      #   run: npm run lint # Assuming a lint script exists
+
+      # Placeholder for tests - to be added later
+      # - name: Run tests
+      #   run: npm test # Assuming a test script exists
+
+      - name: Make gradlew executable
+        run: cd android && chmod +x ./gradlew && cd ..
+
+      - name: Build Android App Bundle (AAB)
+        run: cd android && ./gradlew bundleRelease --no-daemon
+        # This build will use the release signingConfig.
+        # If keystore properties (MYAPP_RELEASE_*) are not found (e.g., not set as secrets for PR builds),
+        # Gradle might skip signing or fail if signing is strictly required and no alternatives are set.
+        # For a CI build test, this is often acceptable. A separate workflow/job handles signed releases.
+
+      - name: Upload Release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error # Error if AAB is not found
