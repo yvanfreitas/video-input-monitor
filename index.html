@@ -2,6 +2,13 @@
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8">
+    <!-- Google Tag Manager: web only, skipped inside the Electron app (file://) -->
+    <script>
+        if (location.protocol === 'https:') {
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MH956V6V');
+        }
+    </script>
+    <!-- End Google Tag Manager -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Monitor de câmera e placa de captura — Video Input Monitor</title>
     <meta name="description" content="Veja webcams, câmeras e placas de captura HDMI direto no navegador, em tela cheia ou Picture-in-Picture. Grátis e sem instalação.">
@@ -93,21 +100,9 @@
         }
     </style>
     <script defer src="/_vercel/insights/script.js"></script>
-    <!-- Google Analytics 4: web only, skipped inside the Electron app (file://) -->
-    <script>
-        if (location.protocol === 'https:') {
-            var ga = document.createElement('script');
-            ga.async = true;
-            ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-47XRHHTKHD';
-            document.head.appendChild(ga);
-            window.dataLayer = window.dataLayer || [];
-            window.gtag = function () { dataLayer.push(arguments); };
-            gtag('js', new Date());
-            gtag('config', 'G-47XRHHTKHD');
-        }
-    </script>
 </head>
 <body>
+    <!-- Google Tag Manager (noscript) --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH956V6V" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><!-- End Google Tag Manager (noscript) -->
     <h1 class="sr-only">Video Input Monitor — monitor de câmera e placa de captura no navegador</h1>
     <video id="video" autoplay playsinline></video>
     <div class="controls" id="controls">
