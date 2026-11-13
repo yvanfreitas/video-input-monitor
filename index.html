@@ -1,7 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Video Input Monitor</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monitor de câmera e placa de captura — Video Input Monitor</title>
+    <meta name="description" content="Veja webcams, câmeras e placas de captura HDMI direto no navegador, em tela cheia ou Picture-in-Picture. Grátis e sem instalação.">
+    <link rel="canonical" href="https://video-input-monitor.vercel.app/">
+    <meta name="robots" content="index,follow">
+    <meta name="author" content="Yvan Freitas">
+    <meta name="theme-color" content="#1f1f1f">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Video Input Monitor">
+    <meta property="og:title" content="Monitor de câmera e placa de captura — Video Input Monitor">
+    <meta property="og:description" content="Veja webcams, câmeras e placas de captura HDMI direto no navegador, em tela cheia ou Picture-in-Picture. Grátis e sem instalação.">
+    <meta property="og:url" content="https://video-input-monitor.vercel.app/">
+    <meta property="og:image" content="https://video-input-monitor.vercel.app/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Video Input Monitor — monitor de câmera e placa de captura no navegador">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Monitor de câmera e placa de captura — Video Input Monitor">
+    <meta name="twitter:description" content="Veja webcams, câmeras e placas de captura HDMI direto no navegador, em tela cheia ou Picture-in-Picture. Grátis e sem instalação.">
+    <meta name="twitter:image" content="https://video-input-monitor.vercel.app/og-image.png">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Video Input Monitor",
+        "url": "https://video-input-monitor.vercel.app/",
+        "description": "Monitor de câmeras, webcams e placas de captura de vídeo direto no navegador, com tela cheia e Picture-in-Picture.",
+        "inLanguage": "pt-BR",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Qualquer (navegador moderno)",
+        "browserRequirements": "Requer navegador com suporte a getUserMedia (Chrome, Edge, Firefox, Safari).",
+        "image": "https://video-input-monitor.vercel.app/og-image.png",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" },
+        "author": { "@type": "Person", "name": "Yvan Freitas", "url": "https://ew.codes/" }
+    }
+    </script>
     <style>
         body, html {
             margin: 0;
@@ -32,6 +71,16 @@
             border-radius: 8px;
             transition: opacity 0.5s ease;
         }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            color: #fff;
+        }
         .controls.hidden {
             opacity: 0;
         }
@@ -44,8 +93,22 @@
         }
     </style>
     <script defer src="/_vercel/insights/script.js"></script>
+    <!-- Google Analytics 4: web only, skipped inside the Electron app (file://) -->
+    <script>
+        if (location.protocol === 'https:') {
+            var ga = document.createElement('script');
+            ga.async = true;
+            ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-47XRHHTKHD';
+            document.head.appendChild(ga);
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = function () { dataLayer.push(arguments); };
+            gtag('js', new Date());
+            gtag('config', 'G-47XRHHTKHD');
+        }
+    </script>
 </head>
 <body>
+    <h1 class="sr-only">Video Input Monitor — monitor de câmera e placa de captura no navegador</h1>
     <video id="video" autoplay playsinline></video>
     <div class="controls" id="controls">
         <select id="videoSelect"></select>

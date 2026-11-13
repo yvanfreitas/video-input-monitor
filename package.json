@@ -24,6 +24,9 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
-    "@vercel/edge": "^0.1.2" 
+    "@vercel/edge": "^0.1.2"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }
