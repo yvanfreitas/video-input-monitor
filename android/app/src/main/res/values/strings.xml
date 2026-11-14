@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Video Input Monitor</string>
+    <string name="pip">PiP</string>
+    <string name="fullscreen">Tela cheia</string>
+    <string name="audio_on">Som: ligado</string>
+    <string name="audio_off">Som: desligado</string>
+    <string name="no_device">Nenhuma placa</string>
+    <string name="notification_channel">Captura</string>
+    <string name="notification_text">Capturando vídeo e áudio da placa</string>
+</resources>

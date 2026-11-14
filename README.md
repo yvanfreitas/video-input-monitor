@@ -9,6 +9,10 @@ Video Input Monitor is a cross-platform Electron application that allows users t
 - **Picture-in-Picture (PIP)**: Keep the video feed visible in a floating window while working on other tasks.
 - **Automatic Controls Hide**: The controls automatically hide after 5 seconds of inactivity for an unobstructed view.
 
+## Android (with Android Auto)
+
+An Android version that captures from a USB (UVC) capture card, with Android Auto support, lives in [`android/`](android/README.md). APKs are published as `android-v*` GitHub releases.
+
 ## Getting Started
 
 ### Prerequisites
