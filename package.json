@@ -8,8 +8,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Yvan Freitas",
+  "license": "MIT",
   "description": "Monitor webcam and video input feeds in a window, fullscreen or picture-in-picture",
   "devDependencies": {
     "@electron-forge/cli": "^7.5.0",
