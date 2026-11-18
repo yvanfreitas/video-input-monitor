@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/entity.json
+
+id: user
+name: User
+kind: actor
+caption: Watches a camera or capture card
+icon: lucide:user
+
+connections:
+  - id: uses-web
+    to: web
+    label: Watches and controls the feed
+    technologies: [ https ]
+  - id: uses-desktop
+    to: desktop
+    label: Watches the feed in the window
+  - id: downloads
+    to: github
+    label: Downloads the desktop build
+    technologies: [ https ]

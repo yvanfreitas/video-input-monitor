@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/entity.json
+
+id: developer
+name: Developer
+kind: actor
+icon: lucide:user-cog
+
+connections:
+  - id: push
+    to: github
+    label: Pushes commits to main and v* tags

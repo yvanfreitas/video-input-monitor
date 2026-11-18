@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/flow.json
+
+id: watch-in-browser
+name: Watch a video input in the browser
+description: The page asks for the camera once, lists the inputs and switches when the user picks another one.
+drawing: apps
+
+steps:
+  - id: opens-the-page
+    via: user.uses-web
+    text: Opens video-input-monitor.vercel.app
+  - id: loads-the-tag
+    via: web.tag
+    text: Loads Google Tag Manager (https only)
+  - id: opens-default-input
+    via: web.video
+    text: Asks for camera permission and opens the default input at 1920x1080
+  - id: lists-inputs
+    via: web.video
+    text: Lists the videoinput devices into the dropdown
+  - id: picks-an-input
+    via: user.uses-web
+    text: Picks another input in the dropdown
+  - id: switches-input
+    via: web.video
+    text: Stops the current tracks and opens the chosen device
+  - id: shows-the-feed
+    via: user.uses-web
+    text: Shows the feed; fullscreen or Picture-in-Picture on request
+    reply: true

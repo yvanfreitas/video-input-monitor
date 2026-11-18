@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/entity.json
+
+id: icons8
+name: Icons8
+kind: system
+caption: img.icons8.com
+icon: lucide:image
+external: true

@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/entity.json
+
+id: web
+name: Web page
+kind: app
+parent: video-input-monitor
+caption: index.html on Vercel
+icon: lucide:globe
+description: |
+  Static single page (index.html, inline script) served at
+  video-input-monitor.vercel.app. middleware.js runs as Vercel Edge Middleware
+  and adds security headers (HSTS, X-Frame-Options DENY, nosniff) to every
+  response. robots.txt, sitemap.xml and Open Graph tags are served next to it.
+technologies: [ html-js, vercel, edge-middleware ]
+
+connections:
+  - id: video
+    to: video-device
+    label: Lists inputs and opens the stream
+    technologies: [ media-devices ]
+  - id: tag
+    to: gtm
+    label: Loads the container GTM-MH956V6V
+    technologies: [ gtm, https ]
+  - id: insights
+    to: vercel-analytics
+    label: Loads /_vercel/insights/script.js
+    technologies: [ https ]
+  - id: icons
+    to: icons8
+    label: Loads the control button icons
+    technologies: [ https ]

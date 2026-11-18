@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/entity.json
+
+id: gtm
+name: Google Tag Manager
+kind: system
+caption: Web only
+icon: si:googletagmanager
+external: true

@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/catalog.json
+
+technologies:
+  - id: html-js
+    name: HTML + JavaScript
+  - id: electron
+    name: Electron
+  - id: vercel
+    name: Vercel
+  - id: edge-middleware
+    name: Vercel Edge Middleware
+  - id: media-devices
+    name: MediaDevices API
+  - id: github-actions
+    name: GitHub Actions
+  - id: gtm
+    name: Google Tag Manager
+  - id: https
+    name: HTTPS
+tags:
+  []
+teams:
+  []

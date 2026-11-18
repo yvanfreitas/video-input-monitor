@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/drawing.json
+
+id: apps
+name: Apps
+description: The same index.html runs as a web page on Vercel and inside an Electron window. Both read the video input straight from the device.
+scope: video-input-monitor
+
+nodes:
+  desktop: { x: 448, y: 640 }
+  developer: { x: -384, y: 960 }
+  github: { x: 0, y: 960 }
+  gtm: { x: 960, y: -224 }
+  icons8: { x: 960, y: 320 }
+  user: { x: 64, y: 320 }
+  vercel-analytics: { x: 960, y: 0 }
+  video-device: { x: 448, y: 320 }
+  web: { x: 448, y: 0 }
+
+edges:
+  desktop.icons: { shape: auto, from: right, to: bottom }
+  desktop.video: { shape: straight, from: top, to: bottom }
+  developer.push: { shape: straight }
+  github.release: { shape: auto, from: right, to: bottom }
+  user.downloads: { shape: straight, from: bottom, to: top, labelAt: 0.8 }
+  user.uses-desktop: { shape: auto, from: right, to: left, labelAt: 0.78 }
+  user.uses-web: { shape: auto, from: right, to: left }
+  web.icons: { shape: auto, from: right, to: left }
+  web.insights: { shape: auto, from: right, to: left }
+  web.tag: { shape: auto, from: top, to: left }
+  web.video: { shape: straight, from: bottom, to: top }

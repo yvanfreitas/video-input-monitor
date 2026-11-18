@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/drawing.json
+
+id: context
+name: Context
+description: Video Input Monitor at a glance, from the people who use and ship it to the services the page loads.
+scope: null
+
+nodes:
+  developer: { x: -384, y: 544 }
+  github: { x: 0, y: 544 }
+  gtm: { x: 448, y: -224 }
+  icons8: { x: 960, y: 544 }
+  user: { x: 64, y: 160 }
+  vercel-analytics: { x: 960, y: -224 }
+  video-device: { x: 960, y: 160 }
+  video-input-monitor: { x: 448, y: 160 }
+
+edges:
+  developer.push: { shape: straight }
+  github.release: { shape: auto, from: right, to: bottom }
+  user.downloads: { shape: straight, from: bottom, to: top }
+  user.uses-web: { shape: straight }
+  web.icons: { shape: auto, from: right, to: left }
+  web.insights: { shape: auto, from: right, to: left }
+  web.tag: { shape: straight, from: top, to: bottom }
+  web.video: { shape: straight, from: right, to: left }

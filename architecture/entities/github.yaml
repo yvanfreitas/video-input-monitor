@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/entity.json
+
+id: github
+name: GitHub
+kind: system
+caption: "Repository, Actions and Releases"
+icon: si:github
+description: |
+  tag.yml creates a release on every push to main. linux-release.yml runs on
+  v* tags: npm install, npx electron-builder --linux, then publishes dist/* as
+  a GitHub release.
+external: true
+technologies: [ github-actions ]
+
+connections:
+  - id: release
+    to: desktop
+    label: Builds and releases for Linux
+    technologies: [ github-actions ]
