@@ -1,25 +1,54 @@
+# On every push to main: if the version in package.json has no v<version> tag yet, create that
+# tag and its GitHub release on the pushed commit, then build the Linux packages and attach them.
+# A push that does not change the version releases nothing.
 name: Create/update tag
 on:
   push:
-    branches: "main"
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: tag-release
 jobs:
-  build:
-    name: Create Release
+  tag:
+    name: Tag new version
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      # Empty when the tag already existed, which skips the build below.
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@latest
+        uses: actions/checkout@v4
+      - name: Create tag and release if the version is new
+        id: tag
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$(node -p "require('./package.json').version")"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
+            echo "Tag $tag already exists: nothing to release."
+            exit 0
+          else
+            status=$?
+            # 2 means "no such tag"; anything else is a real failure.
+            if [ "$status" -ne 2 ]; then
+              echo "::error::Could not look up tag $tag (git ls-remote exited with $status)"
+              exit "$status"
+            fi
+          fi
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --generate-notes
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  # A tag created with the workflow token does not trigger other workflows, so the Linux build
+  # is called here instead of relying on its own "push tag" trigger.
+  linux:
+    name: Linux packages
+    needs: tag
+    if: needs.tag.outputs.tag != ''
+    permissions:
+      contents: write
+    uses: ./.github/workflows/linux-release.yml
+    with:
+      tag: ${{ needs.tag.outputs.tag }}
