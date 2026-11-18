@@ -13,7 +13,7 @@ Video Input Monitor is a cross-platform Electron application that allows users t
 
 ### Prerequisites
 
-- **Node.js** (v18 or later)
+- **Node.js** 22.x (the version in `engines` of `package.json`)
 - **npm** (included with Node.js)
 
 ### Installation
@@ -41,10 +41,19 @@ npm start
 
 ### Building for Distribution
 
-This project includes a GitHub Action workflow to generate executables for Windows, macOS, and Linux. To create a new release:
+The app is packaged with [Electron Forge](https://www.electronforge.io/) (`forge.config.js`). To build the packages for the platform you are on:
 
-1. Commit and push your changes to the `main` branch.
-2. GitHub Actions will automatically build the project and create executables for each platform as part of the release process.
+```sh
+npm run make
+```
+
+The output goes to `out/make`. On Linux this produces a `.deb` and an `.rpm` and needs `dpkg`, `fakeroot` and `rpm` installed.
+
+GitHub Actions builds and releases the Linux packages only. To publish a new release:
+
+1. Bump `version` in `package.json`.
+2. Commit and push to the `main` branch.
+3. GitHub Actions creates the tag `v<version>` with a GitHub release and attaches the Linux packages to it. A push that does not change the version releases nothing.
 
 ## Usage
 
@@ -55,14 +64,18 @@ This project includes a GitHub Action workflow to generate executables for Windo
 
 ## Project Structure
 
-- **main.js**: Main file for starting the Electron application.
+- **index.js**: Main file for starting the Electron application.
 - **index.html**: Contains the UI for selecting webcam inputs and controlling video features.
 - **package.json**: Configuration and scripts for the project.
-- **preload.js** (optional): Preloading script for secure context handling.
+- **forge.config.js**: Electron Forge packaging configuration.
+- **preload.js**: Preload script loaded by the Electron window.
 
 ## GitHub Actions
 
-The GitHub Action workflow (`.github/workflows/build.yml`) automatically builds the application for Windows, macOS, and Linux when changes are pushed to the `main` branch, and creates a new release with the executables.
+- `.github/workflows/tag.yml` runs on every push to `main`. If the version in `package.json` has no `v<version>` tag yet, it creates the tag and a GitHub release, then calls the Linux build.
+- `.github/workflows/linux-release.yml` runs `npm ci` and `npm run make` on Ubuntu and attaches the `.deb` and `.rpm` to the release of the tag. It also runs when a `v*` tag is pushed by hand, and can be started manually as a build-only check (it publishes only when run on a tag).
+
+There are no Windows or macOS builds in CI.
 
 ## Dependencies
 
