@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/flow.json
+
+id: watch-in-desktop
+name: Watch a video input in the desktop app
+description: The Electron window loads the same page from disk and reads the device the same way.
+drawing: apps
+
+steps:
+  - id: opens-the-app
+    via: user.uses-desktop
+    text: Opens the app; an 800x600 window loads index.html
+  - id: opens-default-input
+    via: desktop.video
+    text: Opens the default input at 1920x1080 and lists the others
+  - id: shows-the-feed
+    via: user.uses-desktop
+    text: Shows the feed; controls hide after 5 seconds without mouse movement
+    reply: true

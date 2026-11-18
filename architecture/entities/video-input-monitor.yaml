@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/entity.json
+
+id: video-input-monitor
+name: Video Input Monitor
+kind: system
+caption: Camera and capture card monitor
+icon: lucide:monitor-play
+description: |
+  Shows the feed of a webcam, camera or HDMI capture card, with fullscreen and
+  Picture-in-Picture. One index.html is both the web page and the window of the
+  Electron desktop app. No backend and no storage.
+links:
+  - label: Production
+    url: https://video-input-monitor.vercel.app/
+  - label: Repository
+    url: https://github.com/yvanfreitas/video-input-monitor

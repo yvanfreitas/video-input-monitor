@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://unpkg.com/zark/schema/entity.json
+
+id: desktop
+name: Desktop app
+kind: app
+parent: video-input-monitor
+caption: Electron window
+icon: si:electron
+description: |
+  index.js opens an 800x600 BrowserWindow without menu bar and loads the same
+  index.html from disk (file://), so Google Tag Manager is skipped. Packaging
+  is configured with Electron Forge (Squirrel, zip, deb, rpm).
+technologies: [ electron, html-js ]
+
+connections:
+  - id: video
+    to: video-device
+    label: Lists inputs and opens the stream
+    technologies: [ media-devices ]
+  - id: icons
+    to: icons8
+    label: Loads the control button icons
+    technologies: [ https ]
