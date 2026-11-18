@@ -8,4 +8,4 @@ icon: lucide:user-cog
 connections:
   - id: push
     to: github
-    label: Pushes commits to main and v* tags
+    label: Pushes version bumps to main

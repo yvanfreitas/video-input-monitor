@@ -6,9 +6,12 @@ kind: system
 caption: "Repository, Actions and Releases"
 icon: si:github
 description: |
-  tag.yml creates a release on every push to main. linux-release.yml runs on
-  v* tags: npm install, npx electron-builder --linux, then publishes dist/* as
-  a GitHub release.
+  tag.yml runs on every push to main: when the package.json version has no
+  v<version> tag yet, it creates the tag and its release, then calls
+  linux-release.yml. That workflow (also run by a hand-pushed v* tag) does
+  npm ci and npm run make (Electron Forge) and attaches the .deb and .rpm
+  from out/make to the release of the tag. Run manually on a branch, it only
+  builds.
 external: true
 technologies: [ github-actions ]
 
