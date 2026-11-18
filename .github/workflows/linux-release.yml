@@ -22,7 +22,9 @@ permissions:
 jobs:
   build-linux:
     name: Build for Linux
-    runs-on: ubuntu-latest
+    # Pinned: the rpm maker (electron-installer-redhat) fails with the rpmbuild of ubuntu-26.04,
+    # the image behind ubuntu-latest ("cp: cannot stat 'usr/*'" in %install).
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
