@@ -2,16 +2,16 @@
 
 id: release-desktop
 name: Release the desktop app
-description: A v* tag makes GitHub Actions build the Linux package and attach it to a GitHub release.
+description: A new version in package.json on main makes GitHub Actions tag it, build the Linux packages and attach them to a GitHub release.
 drawing: apps
 
 steps:
-  - id: pushes-a-tag
+  - id: pushes-a-version
     via: developer.push
-    text: Pushes a v* tag
+    text: Pushes a new package.json version to main
   - id: builds-and-releases
     via: github.release
-    text: "linux-release.yml: npm install, electron-builder --linux, release with dist/*"
+    text: "tag.yml creates v<version> and its release; linux-release.yml: npm ci, npm run make, attaches the .deb and .rpm"
   - id: downloads-the-build
     via: user.downloads
     text: Downloads the package from the release

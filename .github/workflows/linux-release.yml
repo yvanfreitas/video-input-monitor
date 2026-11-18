@@ -1,52 +1,86 @@
+# Builds the Linux packages (.deb and .rpm) with Electron Forge and attaches them to the release
+# of a tag. Runs when tag.yml creates a new version tag (workflow_call), when a v* tag is pushed
+# by hand, or manually (workflow_dispatch) as a build-only check that publishes nothing unless
+# it is run on a tag.
 name: Release for Linux
 
 on:
   push:
     tags:
       - v*
+  workflow_call:
+    inputs:
+      tag:
+        description: Existing tag whose release receives the packages
+        required: true
+        type: string
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build-linux:
-    name: Build and Release for Linux
-    runs-on: ubuntu-latest
+    name: Build for Linux
+    # Pinned: the rpm maker (electron-installer-redhat) fails with the rpmbuild of ubuntu-26.04,
+    # the image behind ubuntu-latest ("cp: cannot stat 'usr/*'" in %install).
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
+          cache: npm
+
+      # maker-deb needs dpkg and fakeroot, maker-rpm needs rpmbuild (package "rpm").
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg fakeroot rpm
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npm ci
 
-      - name: Build Electron App for Linux
-        run: |
-          npx electron-builder --linux
+      - name: Build Linux packages with Electron Forge
+        run: npm run make
 
-      - name: Upload Release Artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
         with:
           name: electron-app-linux
-          path: dist/*
+          path: |
+            out/make/deb/x64/*.deb
+            out/make/rpm/x64/*.rpm
+          if-no-files-found: error
 
   release:
-    name: Create Release
+    name: Attach packages to the release
     needs: build-linux
+    # Only for a tag: never from a manual run on a branch.
+    if: inputs.tag != '' || github.ref_type == 'tag'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3
+      - name: Download packages
+        uses: actions/download-artifact@v4
         with:
           name: electron-app-linux
           path: release-artifacts
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: release-artifacts/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create the release if the tag has none
+        run: |
+          if ! gh release view "$TAG" > /dev/null 2>&1; then
+            gh release create "$TAG" --verify-tag --title "$TAG" --generate-notes
+          fi
+
+      - name: Upload packages to the release
+        run: find release-artifacts -type f \( -name '*.deb' -o -name '*.rpm' \) -exec gh release upload "$TAG" --clobber {} +
